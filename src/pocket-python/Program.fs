@@ -45,7 +45,7 @@ let runProc filename args startDir env =
     if p.ExitCode = 0 then Choice1Of2 (cleanOut outputs,cleanOut errors)
     else Choice2Of2 (cleanOut outputs,cleanOut errors)
 
-let url = "https://www.python.org/ftp/python/3.8.1/python-3.8.1-embed-win32.zip"
+let url = "https://www.python.org/ftp/python/3.7.1/python-3.7.1-embed-win32.zip"
 
 [<EntryPoint;STAThread>]
 let main argv = 
@@ -53,7 +53,7 @@ let main argv =
     let wd = System.Environment.CurrentDirectory
     let target = Path.Combine(wd,"python")
     use wc = new WebClient()
-    let scripts = [Path.Combine(target,"Scripts")]
+    let scripts = [Path.Combine(target,"Scripts"); Path.Combine(target,"Lib")]
     if not (Directory.Exists target) then
 
         let download = Path.Combine(wd, "python.zip")
@@ -61,14 +61,16 @@ let main argv =
         Directory.CreateDirectory target |> ignore
         ZipFile.ExtractToDirectory(download, target)
 
-        let pthPath = Path.Combine(target,"python38._pth")
+        let pthPath = Path.Combine(target,"python37._pth")
         let pth = File.ReadAllText(pthPath)
         File.WriteAllText(pthPath, pth.Replace("#import site","import site"))
 
         wc.DownloadFile("https://bootstrap.pypa.io/get-pip.py", Path.Combine(target,"get-pip.py"))
-        runProc (Path.Combine(target,"python.exe")) "get-pip.py" (Some target) [] |> printfn "%A"
+        runProc (Path.Combine(target,"python.exe")) "get-pip.py" (Some target) scripts |> printfn "%A"
 
 
-    runProc (Path.Combine(target,"Scripts","pip.exe")) "install exif opencv-python numpy lensfunpy" (Some target) [] |> printfn "%A"
+    runProc (Path.Combine(target,"Scripts","pip.exe")) "install exif opencv-python numpy " (Some target) scripts |> printfn "%A"
+    runProc (Path.Combine(target,"Scripts","pip.exe")) "install lensfunpy" (Some target) scripts |> printfn "%A"
+    
 
     0
