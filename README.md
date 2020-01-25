@@ -5,7 +5,7 @@ call python scripts from dotnet without installing stuff.
 
 Example:
 ```
-    let run = Pocket.run ["exif"; "opencv-python"; "numpy"; "lensfunpy"]
+    let run = Pocket.run ["opencv-python";]
     let img = @"..."
     let result = 
         run """
