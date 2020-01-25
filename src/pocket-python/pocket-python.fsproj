@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -14,11 +14,8 @@
     <RunWorkingDirectory>$(OutputPath)\netcoreapp2.2</RunWorkingDirectory>
   </PropertyGroup>
   <ItemGroup>
-
     <None Include="paket.references" />
-
-    <Compile Include="Program.fs" />
+    <Compile Include="Runner.fs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

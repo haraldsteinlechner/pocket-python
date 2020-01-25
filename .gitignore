@@ -12,3 +12,5 @@ bin/Debug
 /.fake
 /.paket
 /Aardvark.log
+/src/Example/bin/Debug/netcoreapp2.0
+/src/Example/bin/Release/netcoreapp2.0
