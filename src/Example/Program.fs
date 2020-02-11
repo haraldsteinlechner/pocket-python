@@ -14,7 +14,7 @@ open PocketPython
 [<EntryPoint;STAThread>]
 let main argv = 
     
-    let run = Pocket.run ["exif"; "opencv-python"; "numpy"; "lensfunpy"]
+    let run = Pocket.run ["opencv-python";]
 
     let img = @"C:\Users\hs\lens\IMG_6976.JPG"
 

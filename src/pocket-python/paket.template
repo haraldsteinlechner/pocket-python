@@ -1,0 +1,8 @@
+type project
+id pocketPython
+authors Harald Steinlechner & Contributors
+owners Harald Steinlechner & Contributors
+projectUrl https://github.com/haraldsteinlechner/lensfun.NET
+licenseUrl http://www.apache.org/licenses/LICENSE-2.0.txt
+description
+   should be easy to have python at hand. this package downloads the embedded python version and sets you (sandboxed) up in one command.
