@@ -27,3 +27,5 @@ flip(sys.argv[1])
         | Choice1Of2(_, _, errors) -> failwithf "failed with: %A" errors
         | Choice2Of2(output,_) -> printfn "flip image is here: %s" (List.last output)      
 ```
+
+package is on nuget: https://www.nuget.org/packages/pocketPython/
