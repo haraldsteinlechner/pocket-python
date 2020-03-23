@@ -14,7 +14,7 @@ open PocketPython
 [<EntryPoint;STAThread>]
 let main argv = 
     
-    let run = Pocket.run ["opencv-python";]
+    let run = Pocket.runIn (printfn "%s") System.Environment.CurrentDirectory ["opencv-python";]
 
     let img = @"C:\Users\hs\lens\IMG_6976.JPG"
 

@@ -60,16 +60,17 @@ module Pocket =
         let cleanOut l = l |> Seq.filter (fun o -> String.IsNullOrEmpty o |> not) |> Seq.toArray
         { exitCode = p.ExitCode; stderr = cleanOut errors; stdout = cleanOut outputs }
 
-    let url = "https://www.python.org/ftp/python/3.7.1/python-3.7.1-embed-win32.zip"
+    let mutable url = "https://www.python.org/ftp/python/3.7.1/python-3.7.1-embed-amd64.zip"
 
 
 
-    let runIn (logger : string -> unit) (workingDirectory : string) (packages : list<string>) (script : string) = 
+    let runIn (logger : string -> unit) (workingDirectory : string) (packages : list<string>)  = 
         let target = Path.Combine(workingDirectory,"python")
         use wc = new WebClient()
         let scripts = [Path.Combine(target,"Scripts"); Path.Combine(target,"Lib")]
         if not (Directory.Exists target) then
 
+            logger "[pocket-python] downloading python environment"
             let download = Path.Combine(workingDirectory, "python.zip")
             let d = wc.DownloadFile(url, "python.zip")
             Directory.CreateDirectory target |> ignore
@@ -80,6 +81,7 @@ module Pocket =
             File.WriteAllText(pthPath, pth.Replace("#import site","import site"))
 
             wc.DownloadFile("https://bootstrap.pypa.io/get-pip.py", Path.Combine(target,"get-pip.py"))
+            logger "[pocket-python] installing pip"
             runProc logger (Path.Combine(target,"python.exe")) "get-pip.py" (Some target) scripts None |> printfn "%A"
 
         let packages = String.concat " " packages
@@ -87,7 +89,7 @@ module Pocket =
         if r.exitCode <> 0 then
             failwithf "%A" r.stderr
         else
-            fun args eval -> 
+            fun (script : string) (args : string) (eval : string) -> 
                 let file = Path.ChangeExtension(Path.GetTempFileName(),"py")
                 File.WriteAllText(file,script)
                 let args = sprintf "%s %s" file args
