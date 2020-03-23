@@ -72,7 +72,7 @@ module Pocket =
 
             logger "[pocket-python] downloading python environment"
             let download = Path.Combine(workingDirectory, "python.zip")
-            let d = wc.DownloadFile(url, "python.zip")
+            let d = wc.DownloadFile(url, download)
             Directory.CreateDirectory target |> ignore
             ZipFile.ExtractToDirectory(download, target)
 
