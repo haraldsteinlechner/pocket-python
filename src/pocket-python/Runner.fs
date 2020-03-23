@@ -12,6 +12,8 @@ open System.Collections.Generic
 
 module Pocket =
 
+    type Result = { exitCode : int; stderr : string[]; stdout : string[] }
+
     let runProc (logger : string -> unit) filename args startDir env (stdinText : Option<string>) = 
         let timer = Stopwatch.StartNew()
         let procStartInfo = 
@@ -55,11 +57,11 @@ module Pocket =
         p.WaitForExit()
         timer.Stop()
         logger <| sprintf "Finished %s after %A milliseconds" filename timer.ElapsedMilliseconds
-        let cleanOut l = l |> Seq.filter (fun o -> String.IsNullOrEmpty o |> not) |> Seq.toList
-        if p.ExitCode <> 0 then Choice1Of2 ( p.ExitCode, cleanOut outputs, cleanOut errors)
-        else Choice2Of2 (cleanOut outputs,cleanOut errors)
+        let cleanOut l = l |> Seq.filter (fun o -> String.IsNullOrEmpty o |> not) |> Seq.toArray
+        { exitCode = p.ExitCode; stderr = cleanOut outputs; stdout = cleanOut errors }
 
     let url = "https://www.python.org/ftp/python/3.7.1/python-3.7.1-embed-win32.zip"
+
 
 
     let runIn (logger : string -> unit) (workingDirectory : string) (packages : list<string>) (script : string) = 
@@ -81,18 +83,16 @@ module Pocket =
             runProc logger (Path.Combine(target,"python.exe")) "get-pip.py" (Some target) scripts None |> printfn "%A"
 
         let packages = String.concat " " packages
-        match runProc logger (Path.Combine(target,"Scripts","pip.exe")) (sprintf "install %s" packages) (Some target) scripts None with 
-            | Choice1Of2 (code, output,errors)  -> 
-                failwithf "%A" errors
-            | _-> 
-                fun args eval -> 
-                    let file = Path.ChangeExtension(Path.GetTempFileName(),"py")
-                    File.WriteAllText(file,script)
-                    let args = sprintf "%s %s" file args
-                    match runProc logger (Path.Combine(target,"python.exe")) args (Some target) scripts (Some eval) with 
-                        | Choice1Of2(code, output,errors) -> Choice1Of2(code, output, errors)
-                        | Choice2Of2(output,errors) -> Choice2Of2(output,errors)
+        let r = runProc logger (Path.Combine(target,"Scripts","pip.exe")) (sprintf "install %s" packages) (Some target) scripts None  
+        if r.exitCode <> 0 then
+            failwithf "%A" r.stderr
+        else
+            fun args eval -> 
+                let file = Path.ChangeExtension(Path.GetTempFileName(),"py")
+                File.WriteAllText(file,script)
+                let args = sprintf "%s %s" file args
+                runProc logger (Path.Combine(target,"python.exe")) args (Some target) scripts (Some eval) 
 
 
-    let run (packages : list<string>)  = runIn ignore System.Environment.CurrentDirectory packages
+    let run (packages : list<string>) (code : string) (args : string) (evalCode : string) = runIn ignore System.Environment.CurrentDirectory packages code args evalCode
     
