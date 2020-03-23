@@ -58,7 +58,7 @@ module Pocket =
         timer.Stop()
         logger <| sprintf "Finished %s after %A milliseconds" filename timer.ElapsedMilliseconds
         let cleanOut l = l |> Seq.filter (fun o -> String.IsNullOrEmpty o |> not) |> Seq.toArray
-        { exitCode = p.ExitCode; stderr = cleanOut outputs; stdout = cleanOut errors }
+        { exitCode = p.ExitCode; stderr = cleanOut errors; stdout = cleanOut outputs }
 
     let url = "https://www.python.org/ftp/python/3.7.1/python-3.7.1-embed-win32.zip"
 
