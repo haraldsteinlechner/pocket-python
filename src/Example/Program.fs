@@ -40,9 +40,9 @@ def flip(image_path):
 flip(sys.argv[1])
         """ img ""
 
-    match result with
-        | Choice1Of2(_, _, errors) -> failwithf "failed with: %A" errors
-        | Choice2Of2(output,_) -> printfn "flip image is here: %s" (List.last output)
+    if result.exitCode <> 0 then
+        failwithf "failed with: %A" result.stderr
+    else printfn "flip image is here: %s" (Array.last result.stdout)
 
     0
 
